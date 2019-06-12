@@ -1,0 +1,147 @@
+---
+title: "hw1"
+author: "n.hwang"
+date: "June 11, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description of the Recommender System
+
+This system recommends jobs to job search candidates based on their previous rankings of job recommendations and other similar applicants. 
+
+## Dataset
+
+I built my own dataset of dimensions 6 x 4, where the rows are applicants or users, and the columns are the job posting items, for a total of 24 data points as shown below.
+
+```{r}
+data <- as.data.frame(matrix(nrow = 6, ncol = 4))
+names(data) <- c("A","B","C","D")
+data$A <- c(1,2,1,1,1,2)
+data$B <- c(2,4,2,3,2,4)
+data$C <- c(4,5,4,5,4,5)
+data$D <- c(3,4,3,3,3,5)
+data
+```
+
+## Train and Test Sets
+
+To create a test set out of the dataset above, I hold out 1 item from the data matrix above representing the following user-item combinations (1,A), (2,B), (3,C), and (4,D), where the numbers represent the users and the capital letters the job description items.\\
+
+Then, the train set is the complement of the test set on the data set shown above. As a result, we have 20 train set data points, and 4 test set data points. 
+
+```{r}
+a <- c(NA,2,1,1,1,2)
+b <- c(2,NA,2,3,2,4)
+c <- c(4,5,NA,5,4,5)
+d <- c(3,4,3,NA,3,5)
+
+train <- data.frame(A = a, B = b, C = c, D = d)
+train
+```
+
+## The raw average rating for every user-item combination in the train set.
+
+Taking the average of the 20 training set data points as shown below yields 3.05. 
+
+```{r}
+raw_mean_train <- mean(as.matrix(train), na.rm=TRUE)
+raw_mean_train
+```
+
+## RMSE for raw average
+
+Using the raw average of all the user-item combinations above, I calculate the RMSE for both the train and test sets below. The RMSE for the train is 1.36, and 1.226 for test. 
+
+```{r}
+## Train set
+Rij = 0
+for (i in 1:6){
+  for (j in 1:4){
+    if (!is.na(train[i,j])){
+      Rij = Rij + (train[i,j]-raw_mean_train)^2
+    }
+  }
+}
+RMSE_train <- sqrt(Rij/20)
+RMSE_train
+
+# Test set
+Rij = 0
+for (i in 1:6){
+  for (j in 1:4){
+    if (is.na(train[i,j])){
+      Rij = Rij + (data[i,j]-raw_mean_train)^2
+    }
+  }
+}
+RMSE_test <- sqrt(Rij/4)
+RMSE_test
+```
+
+## The bias for each user and item
+Taking the mean across all columns (for items), and rows (for users), and subtracting the raw average of 3.05, I obtain the bias as follows. As expected, the vector for the item bias is comprised of 4 items, while the size of the user bias vector is 6.
+
+```{r}
+# Bias
+bias_item <- colMeans(train, na.rm = TRUE) - raw_mean_train
+bias_user <- rowMeans(train, na.rm = TRUE) - raw_mean_train
+bias_item; bias_user
+```
+
+## Baseline predictors for every user-item combination
+
+I compute the baseline predictor for each user-item combination using the formula *raw average + user bias + item bias* corresponding to the particular combination. 
+
+```{r}
+predictors <- data
+for (i in 1:6){
+  for (j in 1:4){
+    predictors[i,j] <- raw_mean_train + bias_user[i] + bias_item[j] 
+  }
+}
+predictors
+```
+
+## RMSE for baseline predictors
+```{r}
+## Train
+Rij = 0
+for (i in 1:6){
+  for (j in 1:4){
+    if (!is.na(train[i,j])){
+      Rij = Rij + (predictors[i,j]-train[i,j])^2
+    }
+  }
+}
+RMSE_train_predictor <- sqrt(Rij/20)
+
+## Test
+Rij = 0
+for (i in 1:6){
+  for (j in 1:4){
+    if (is.na(train[i,j])){
+      Rij = Rij + (predictors[i,j] - data[i,j])^2
+    }
+  }
+}
+
+RMSE_test_predictor <- sqrt(Rij/4)
+
+RMSE_train_predictor; RMSE_test_predictor
+```
+
+## Summary
+We see below that the baseline predictions improved over the naive raw average method by over 70% for the train set and 55% for the test set. 
+
+```{r}
+#summary
+# % improvement for train
+1 - RMSE_train_predictor/RMSE_train
+
+# % improvement for test
+1 - RMSE_test_predictor/RMSE_test
+```
