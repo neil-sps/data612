@@ -1,0 +1,26 @@
+---
+title: "discussion4"
+author: "n.hwang"
+date: "July 3, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Social influence bias
+
+Through the pioneering work of Solomon Asch in the 1950s, social influence bias has been known to exist in a number of settings where people change their own views, and reported preferences, based on the views of others. For instance, in the Asch study, participants were asked to guess the length of a sequence of line segments. While they guessed correctly most of the time when in isolation, when they were asked to guess in the presence of others who conformed to incorrect guesses, the accuracy on their guesses were noticeably lower. 
+
+Examples of social influence bias abound in today's marketplace, such as Amazon and Netflix displaying the average number of stars or ratings for a given product. How strong and prevalent is such a bias? Can we infer consumers' or users' "true" views on a product that is independent of their perceptions about what other people's views are? In "Social Influence Bias in Recommender Systems: A Methodology for Learning, Analyzing, and Mitigating Bias in Ratings", the authors Krishnan et al propose one solution based on two-stage polling and shares empirical data from a case study based on the California Report Card. 
+
+## California Report Card
+Krishnan et al investigate the extent of social influence bias in California Report Card, an initiative in the state to encourage public involvement in policymaking processes through a mobile-app that started in 2014. The idea is that residents' views on policies would change depending on their perceived its level of public support. To counteract this source fo bias, the authors propose a two-stage polling procedure to (1) detect the potential presence of social influence bias; (2) measure the statistical significance of the presence with the Wilcoxon test statistic; and (3) use polynomial regression to estimate the participant's true views based on their responses.  
+
+The procedure would work as follows. First, without showing any aggregate results from the polls so far, the state residents are asked to give ratings on various policy initiatives. Then, the residents are shown the median ratings of other residents on the policy. Finally, the residents are given a chance to adjust their ratings in light of the median statistics. This experiment was conducted on 9,390 participants, and results were enlightening.
+
+The authors found that ratings after the median was displayed were 19% closer to the median value, affirming the presence of social influence bias. The proposed polynomial regression was used to infer the changed ratings with 76% less bias.  
+
+## Implications for other domains
+Implications for policymakers and users alike are clear. For the private citizens, one can form a preference for a policy topic, a news article, or a product without seeing its average or median ratings from others. Then, read about others' views in the aggregate. If substantially different after the fact, then rather than immediately resorting to the aggregate mean, one could find out the reasons for the discrepancy through more research. For policymakers, allowing users to "hide" the average ratings would help alleviate the effect of social influence bias. 
